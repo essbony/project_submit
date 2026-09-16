@@ -34,7 +34,7 @@
        ├──> [Apache Superset] (Visualisation & Tableaux de bord décisionnels)
        └──> [Streamlit + LangChain Agent] (Text-to-SQL en langage naturel)
 ```
-
+---
 * **Stockage & Moteur Analytique** : DuckDB (léger, rapide, embarqué).
 * **Transformation des données** : dbt (Data Build Tool) avec un ordre strict : f.xlsx-> `run` -> `test`.
 * **Visualisation** : Apache Superset (Dashboards décisionnels).
@@ -68,6 +68,7 @@ uv pip install -r awale_agent/requirements.txt
 
 
 ### Étape B : Configuration des Secrets (`.env`)
+```bash
 Créez un fichier `.env` à la racine contenant vos clés d'API (OpenAI, etc.) :
 ```env
 OPENROUTER_API_KEY="....."
