@@ -62,8 +62,9 @@ source .venv/bin/activate ou .env/Scripts/Activate.ps1
 # Installer les dépendances pour agent awale
 Installer et utiliser UV 
 uv pip install -r awale_agent/requirements.txt
-[Lien agentt-awale](https://awale-agent.streamlit.app/)
 ```
+[Lien agentt-awale](https://awale-agent.streamlit.app/)
+
 
 ### Étape B : Configuration des Secrets (`.env`)
 Créez un fichier `.env` à la racine contenant vos clés d'API (OpenAI, etc.) :
