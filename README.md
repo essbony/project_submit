@@ -26,9 +26,9 @@
 ## 🏗️ 2. Architecture Technique
 
 ```text
-[Sources Brutes / Fichiers CSV] 
+[Sources Brutes / Fichiers EXCEL] 
        │
-       ▼ (dbt seed & run)
+       ▼ (Dans duckdb INSTALL spatial; puis LOAD spatial; & dbt run)
 [DuckDB (Entrepôt local)] ──> stg_models ──> fct_business_performance
        │
        ├──> [Apache Superset] (Visualisation & Tableaux de bord décisionnels)
@@ -36,7 +36,7 @@
 ```
 
 * **Stockage & Moteur Analytique** : DuckDB (léger, rapide, embarqué).
-* **Transformation des données** : dbt (Data Build Tool) avec un ordre strict : `seed` -> `run` -> `test`.
+* **Transformation des données** : dbt (Data Build Tool) avec un ordre strict : f.xlsx-> `run` -> `test`.
 * **Visualisation** : Apache Superset (Dashboards décisionnels).
 * **Intelligence Artificielle** : Agent Streamlit connecté à DuckDB via LangChain.
 
@@ -57,35 +57,33 @@ cd project_submit
 
 # Créer et activer l'environnement virtuel
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate ou .env/Scripts/Activate.ps1
 
-# Installer les dépendances
-pip install -r awale_agent/requirements.txt
+# Installer les dépendances pour agent awale
+Installer et utiliser UV 
+uv pip install -r awale_agent/requirements.txt
+lien de l'agent conversationnel: https://awale-agent.streamlit.app/
 ```
 
 ### Étape B : Configuration des Secrets (`.env`)
 Créez un fichier `.env` à la racine contenant vos clés d'API (OpenAI, etc.) :
 ```env
-OPENAI_API_KEY=vos_cles_api_ici
-LLM_CACHE_PATH=/tmp/llm_cache.sqlite
-```
-*(Assurez-vous que le fichier `.env` et la base `*.duckdb` sont bien listés dans votre `.gitignore` pour éviter toute fuite de données ou blocage GitHub).*
+OPENROUTER_API_KEY="....."
 
----
+LLM_CACHE_PATH=/tmp/llm_cache.sqlite
 
 ## 🧹 4. Étapes de Nettoyage & Data Quality (dbt)
 
 Le pipeline dbt garantit la propreté, l'unicité et la validité des données avant leur exposition dans Superset.
 
 ### Ordre d'exécution obligatoire :
-1. **`dbt seed`** : Charge les fichiers CSV statiques de référence et de mapping dans DuckDB.
+1. **`spatial et st_read(...) `** : Charge les fichiers EXCEL  statiques de référence et de mapping dans DuckDB.
 2. **`dbt run`** : Exécute les modèles de staging et les marts analytiques (`fct_business_performance`).
 3. **`dbt test`** : Valide l'intégrité des données (tests d'unicité sur les `comment_id`, non-nullité des clés).
 
 Commandes d'exécution :
 ```bash
 cd dbt/
-dbt seed
 dbt run
 dbt test
 cd ..
@@ -124,17 +122,7 @@ Pour rendre l'agent IA accessible en ligne via Streamlit Cloud :
 3. **Gestion du cache en environnement Read-Only** :
    * Pour éviter l'erreur `sqlite3.OperationalError: attempt to write a readonly database`, configurer explicitement le chemin du cache LangChain vers `/tmp/llm_cache.sqlite` dans le code de l'agent ou les variables d'environnement de la plateforme.
 
----
 
-## 🚧 7. Difficultés Rencontrées & Solutions
-
-| Difficulté / Problème | Cause Technique | Solution Apportée |
-| :--- | :--- | :--- |
-| **Dossiers grisés / verrouillés sur GitHub** | Présence de dossiers `.git` imbriqués créant des sous-modules non désirés. | Suppression des `.git` internes (`rm -rf */.git`), désindexation propre (`git rm -r --cached`) et réajout des dossiers. |
-| **Erreur de base de données en écriture sur le Cloud** | Tentative d'écriture du cache SQLite LangChain dans un répertoire racine en lecture seule. | Redirection dynamique du cache vers le dossier `/tmp/` autorisé. |
-| **Canaux digitaux invisibles dans Superset** | Dissociation entre canaux d'acquisition publicitaire (TikTok/Meta) et canaux de vente directe. | Ajustement de la dimension `channel_or_platform` et de la métrique d'agrégation dans les paramètres du graphique Superset. |
-
----
 *Généré pour le projet Awalé Boissons — Documentation technique validée.*
 
 ## Tech Stack
