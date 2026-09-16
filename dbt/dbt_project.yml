@@ -1,0 +1,33 @@
+name: 'project_submit'
+version: 0.8.9
+
+
+profile: 'project_submit'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:        
+  - "target"
+  - "dbt_packages"
+
+
+models:
+  project_submit:
+   
+    staging:
+      +materialized: view
+      +schema: staging
+
+
+    intermediate:
+      +materialized: ephemeral
+      +schema: intermediate
+
+    marts:
+      +materialized: table
+      +schema: marts

@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: fct_business_performance
+    description: "Table finale consolidant les revenus nets et les dépenses marketing par mois et par canal pour la prise de décision."
+    columns:
+      - name: performance_month
+        description: "Mois de la performance (clé temporelle)."
+        tests:
+          - not_null
+      - name: channel_or_platform
+        description: "Nom du canal de vente ou de la plateforme publicitaire."
+        tests:
+          - not_null
+      - name: net_revenue_fcfa
+        description: "Chiffre d'affaires net total en FCFA."
+        tests:
+          - not_null
+      - name: marketing_spend_fcfa
+        description: "Dépenses publicitaires totales en FCFA."
+        tests:
+          - not_null

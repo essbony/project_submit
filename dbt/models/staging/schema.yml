@@ -1,0 +1,105 @@
+version: 2
+
+sources:
+  - name: raw
+
+    schema: main
+    tables:
+      - name: raw_campaign_spend_export
+      - name: raw_media_plan
+      - name: raw_pos_sales_daily
+      - name: raw_social_comments
+      - name: raw_whatsapp_orders
+      - name: social_comments_classified
+
+models:
+  - name: stg_campaign_spend_export
+    description: "Modèle de staging des dépenses publicitaires consolidées. Conversion des devises EUR en FCFA basée sur le taux de change fixe réglementaire de la BCEAO (1 EUR = 655.957 XOF). Les canaux hors-numérique (radio, influenceurs) avec impressions/clics nuls sont conservés."
+    columns:
+      - name: campaign_name
+        description: "Identifiant textuel brut de la campagne (nomenclature non standardisée)."
+        tests:
+          - not_null
+      - name: spend_amount
+        description: "Montant total normalisé en fcfa."
+      - name: impressions
+        description: "Nombre d'impressions (nullable pour la radio et les influenceurs)."
+      - name: clicks
+        description: "Nombre de clics (nullable pour la radio et les influenceurs)."
+
+  - name: stg_media_plan
+    description: "Modèle de staging du plan média prévisionnel de Kômian. Intègre les canaux exclusifs (radio, influenceurs, terrain) et normalise les libellés de canaux pour assurer la convergence avec les données de dépenses réelles. Met en évidence les écarts de facturation."
+    columns:
+      - name: plan_id
+        description: "Identifiant unique de la ligne du plan média."
+        tests:
+          - not_null
+      - name: canonical_channel
+        description: "Canal média harmonisé servant de clé de liaison commune avec la table des dépenses publicitaires."
+        tests:
+          - not_null
+      - name: planned_budget_fcfa
+        description: "Budget prévisionnel validé en FCFA."
+      - name: invoiced_fcfa
+        description: "Montant réellement facturé en FCFA (nullable)."
+      - name: budget_variance_fcfa
+        description: "Écart calculé entre le facturé et le planifié (visibilité pour le contrôle financier)."
+
+
+  - name: stg_pos_sales_daily
+    description: "Modèle de staging des ventes journalières par point de vente. Résout l'instabilité des identifiants POS (unification des variantes d'Angré) et isole explicitement les retours clients (valeurs négatives) pour le calcul du chiffre d'affaires net."
+    columns:
+      - name: sale_date
+        description: "Date de la vente (la quinzaine manquante suite à une panne système n'est pas imputée)."
+        tests:
+          - not_null
+      - name: canonical_pos_id
+        description: "Identifiant canonique unique et stable du point de vente, résolvant les variations textuelles du système source."
+        tests:
+          - not_null
+      - name: revenue_fcfa
+        description: "Chiffre d'affaires brut ou impact de retour (peut être négatif)."
+      - name: is_return
+        description: "Indicateur booléen (True/False) signalant s'il s'agit d'un retour produit."
+        tests:
+          - not_null
+
+
+  - name: stg_social_comments
+    description: "Modèle de staging des commentaires réseaux sociaux (Meta, TikTok). Nettoie les doublons multi-publications et standardise les horodatages, servant de table source pour la classification de sentiment et de spam par LLM."
+    columns:
+      - name: comment_id
+        description: "Identifiant unique du commentaire."
+        tests:
+          - not_null
+          - unique
+      - name: comment_text
+        description: "Texte brut du commentaire (mélange de français, nouchi, anglais et émojis)."
+        tests:
+          - not_null
+      - name: platform
+        description: "Plateforme source normalisée (instagram, facebook, tiktok)."
+        tests:
+          - not_null
+
+
+  - name: stg_whatsapp_orders
+    description: "Modèle de staging des commandes WhatsApp. Normalise les formats de numéros de téléphone hétérogènes en un identifiant client unique, extrait les articles du texte libre, et isole explicitement les commandes ayant un montant manquant (environ 1 sur 8) pour analyse d'impact."
+    columns:
+      - name: order_ref
+        description: "Référence de la commande (dédupliquée)."
+        tests:
+          - not_null
+      - name: customer_id
+        description: "Numéro de téléphone client normalisé (sur 10 chiffres), servant de clé unique pour l'analyse de récurrence."
+        tests:
+          - not_null
+      - name: amount_fcfa
+        description: "Montant total de la commande en FCFA (nullable)."
+        
+      - name: is_amount_missing
+        description: "Indicateur booléen signalant si le montant de la commande est manquant (permet de quantifier l'impact sur le CA global)."
+        tests:
+          - not_null
+
+

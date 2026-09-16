@@ -1,0 +1,14 @@
+
+project_submit:
+  outputs:
+    dev:
+      type: duckdb
+      path: /home/bony/project_submit/dbt/my_db.duckdb
+      threads: 1
+
+    prod:
+      type: duckdb
+      path: /home/bony/project_submit/dbt/my_db.duckdb
+      threads: 1
+
+  target: dev
