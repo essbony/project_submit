@@ -136,3 +136,7 @@ Pour rendre l'agent IA accessible en ligne via Streamlit Cloud :
 
 ---
 *Généré pour le projet Awalé Boissons — Documentation technique validée.*
+
+## Tech Stack
+
+<img width="100%" alt="Tech stack" src="describe.svg" />
