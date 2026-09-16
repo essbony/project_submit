@@ -5,15 +5,11 @@ duckdb==1.5.5
 duckdb-engine==0.17.0
 httpx==0.28.1
 langchain==1.4.0
-langchain-classic==1.0.8
 langchain-community==0.4.2
 langchain-core==1.6.3
 langchain-openai==1.6.2
 langgraph==1.2.11
-matplotlib==3.11.2
-numpy==2.5.3
 openai==3.14.0
-pandas==3.0.5
 python-dotenv==1.2.3
-streamlit==1.63.0
+
 

@@ -63,7 +63,8 @@ source .venv/bin/activate ou .env/Scripts/Activate.ps1
 Installer et utiliser UV 
 uv pip install -r awale_agent/requirements.txt
 ```
-[Lien agentt-awale](https://awale-agent.streamlit.app/)
+[Lien agent-awale](https://awale-agent.streamlit.app/)
+
 
 
 ### Étape B : Configuration des Secrets (`.env`)
@@ -127,6 +128,5 @@ Pour rendre l'agent IA accessible en ligne via Streamlit Cloud :
 *Généré pour le projet Awalé Boissons — Documentation technique validée.*
 
 ## Tech Stack
-
 
   <img src="describe.svg" alt="Architecture Awalé Boissons" width="100%" />
