@@ -139,6 +139,5 @@ Pour rendre l'agent IA accessible en ligne via Streamlit Cloud :
 
 ## Tech Stack
 
-<p align="center">
-  <img src="/home/bony/project_submit/describe.svg" alt="Architecture Awalé Boissons" width="100%">
-</p>
+
+  <img src="describe.svg" alt="Architecture Awalé Boissons" width="100%" />
