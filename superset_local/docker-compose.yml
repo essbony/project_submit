@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  superset_db:
+    image: postgres:16-alpine
+    container_name: superset_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: superset
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: ${SUPERSET_DB_PASSWORD}
+    volumes:
+      - superset_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U superset"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  superset:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: superset_duckdb:latest
+    container_name: superset_app
+    restart: unless-stopped
+    depends_on:
+      superset_db:
+        condition: service_healthy
+    ports:
+      - "8088:8088"
+    environment:
+      - SUPERSET_SECRET_KEY=${SUPERSET_SECRET_KEY}
+      - SUPERSET_DATABASE_URI=postgresql+psycopg2://superset:${SUPERSET_DB_PASSWORD}@superset_db:5432/superset
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_FIRSTNAME=${ADMIN_FIRSTNAME}
+      - ADMIN_LASTNAME=${ADMIN_LASTNAME}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    volumes:
+      - superset_home:/app/superset_home
+      - /home/bony/project_submit/dbt:/app/duckdb_data
+      - ./superset_config.py:/app/pythonpath/superset_config.py
+      - ./requirements-local.txt:/app/docker/requirements-local.txt
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8088/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+volumes:
+  superset_db_data:
+  superset_home:
