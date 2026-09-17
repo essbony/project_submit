@@ -82,7 +82,7 @@ cd awale_agent/
 uv pip install -r requirements.txt
 streamlit run app.py
 ```
-🔗 Version déployée : [agent-awale](https://awale-agent.streamlit.app/)
+🔗 Version déployée : https://awale-agent.streamlit.app/
 
 ### Étape D : Exécuter le Pipeline dbt
 
@@ -157,8 +157,70 @@ Pour rendre l'agent IA accessible en ligne via Streamlit Cloud :
 3. **Gestion du cache en environnement Read-Only** :
    * Pour éviter l'erreur `sqlite3.OperationalError: attempt to write a readonly database`, configurer explicitement le chemin du cache LangChain vers `/tmp/llm_cache.sqlite` dans le code de l'agent ou les variables d'environnement de la plateforme.
 
+## Schéma des modèles & dictionnaire de données
 
-## Généré pour le projet Awalé Boissons — Documentation technique validée.
+### Représentation visuelle (graphe de lignage dbt)
+
+Le graphe complet des modèles est généré automatiquement via `dbt docs generate && dbt docs serve` (icône *Lineage Graph* en bas à droite de l'interface). Il montre les 4 couches du pipeline :
+
+```
+raw_*  (5 sources brutes, onglets du fichier Excel)
+   │
+   ▼
+staging  (stg_campaign_spend_export, stg_media_plan, stg_pos_sales_daily, stg_whatsapp_orders, stg_social_comments, stg_social_comments_classified)
+   │
+   ▼
+intermediate — ephemeral  (int_marketing_performance, int_sales_unified, int_social_engagement)
+   │
+   ▼
+marts  (fct_business_performance)
+```
+
+> Les modèles intermediate sont matérialisés en `ephemeral` : ils n'apparaissent pas comme tables/vues dans DuckDB (aucun objet physique créé), seulement comme CTE injectés dans le SQL des marts — d'où leur absence de l'arborescence "Tables et vues" du catalogue, mais leur présence dans le graphe de lignage.
+
+![schema des datas](images/schema.png)
+
+### Dictionnaire de données — `fct_business_performance`
+
+Mart final consolidant les revenus nets et les dépenses marketing par mois et par canal pour la prise de décision.
+
+| Colonne | Type | Description | Contrainte |
+|---|---|---|---|
+| `performance_month` | TIMESTAMP | Mois de la performance (clé temporelle) | not_null |
+| `channel_or_platform` | VARCHAR | Nom du canal de vente ou de la plateforme publicitaire | not_null |
+| `net_revenue_fcfa` | DOUBLE | Chiffre d'affaires net total en FCFA | not_null |
+| `marketing_spend_fcfa` | DECIMAL(38,5) | Dépenses publicitaires totales en FCFA | not_null |
+| `unique_customers` | BIGINT | Nombre de clients uniques sur la période | — |
+| `total_comments` | BIGINT | Nombre total de commentaires reçus (réseaux sociaux) | — |
+| `positive_comments` | BIGINT | Nombre de commentaires classés positifs | — |
+| `négatif_comments` | BIGINT | Nombre de commentaires classés négatifs | — |
+| `neutre_commentaires` | BIGINT | Nombre de commentaires classés neutres | — |
+| `spam_comments` | BIGINT | Nombre de commentaires détectés comme spam | — |
+
+> **Limite connue** : les colonnes `négatif_comments` et `neutre_commentaires` rompent la convention de nommage anglaise du reste du mart (`positive_comments`, `spam_comments`) — nommage à harmoniser en `negative_comments` / `neutral_comments` dans une prochaine itération.
+
+# Usage de l'IA
+
+* **Composant IA implémenté** : [agent Text-to-SQL (LangChain `SQLDatabase` + openai/gpt-4o via OpenRouter, interface Streamlit) interrogeant `fct_business_performance` en langage naturel].
+
+## Temps passé
+
+*Du 11 sept. au 17 sept*
+
+| Phase | Temps estimé |
+|---|---|
+| Cadrage & exploration des données | 2 jours|
+| Pipeline dbt (staging/intermediate/marts) |3 jours |
+| Composant IA | 1H 10 min|
+| Dashboard Superset | 10H|
+| Documentation & livrables | 2H|
+| **Total** | 5 jours 13H 10 min|
+
+---
+
+
+
+---
 
 ## 📊 Vue Décisionnelle
 
