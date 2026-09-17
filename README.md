@@ -158,8 +158,14 @@ Pour rendre l'agent IA accessible en ligne via Streamlit Cloud :
    * Pour éviter l'erreur `sqlite3.OperationalError: attempt to write a readonly database`, configurer explicitement le chemin du cache LangChain vers `/tmp/llm_cache.sqlite` dans le code de l'agent ou les variables d'environnement de la plateforme.
 
 
-*Généré pour le projet Awalé Boissons — Documentation technique validée.
+## Généré pour le projet Awalé Boissons — Documentation technique validée.
 
-*Tech Stack
+## 📊 Vue Décisionnelle
+
+![Vue Décisionnelle du Projet](images/vue-decisionnelle.jpg)
+
+
+# Tech Stack
+
 <img src="describe.svg" alt="Architecture Awalé Boissons" width="100%" />
 
