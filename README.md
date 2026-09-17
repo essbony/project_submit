@@ -26,17 +26,17 @@
 ## 🏗️ 2. Architecture Technique
 
 ```text
-[Sources Brutes / Fichiers EXCEL] 
+[Sources Brutes / Fichiers EXCEL]
        │
-       ▼ (Dans duckdb INSTALL spatial; puis LOAD spatial; & dbt run)
+       ▼ (extension DuckDB "spatial" chargée dans un hook dbt : INSTALL spatial; LOAD spatial;)
 [DuckDB (Entrepôt local)] ──> stg_models ──> fct_business_performance
        │
        ├──> [Apache Superset] (Visualisation & Tableaux de bord décisionnels)
        └──> [Streamlit + LangChain Agent] (Text-to-SQL en langage naturel)
 ```
----
+
 * **Stockage & Moteur Analytique** : DuckDB (léger, rapide, embarqué).
-* **Transformation des données** : dbt (Data Build Tool) avec un ordre strict : f.xlsx-> `run` -> `test`.
+* **Transformation des données** : dbt (Data Build Tool), avec lecture directe des fichiers Excel via l'extension DuckDB `spatial` (`st_read`), puis `dbt run` et `dbt test`.
 * **Visualisation** : Apache Superset (Dashboards décisionnels).
 * **Intelligence Artificielle** : Agent Streamlit connecté à DuckDB via LangChain.
 
@@ -47,42 +47,78 @@
 ### Prérequis
 * Python 3.10+
 * Git
+* **Docker & Docker Compose** (requis pour Superset)
+* [uv](https://docs.astral.sh/uv/) (gestionnaire de projet Python)
 * Environnement virtuel Python
 
 ### Étape A : Clonage et Configuration de l'Environnement
+
 ```bash
-# Cloner le dépôt
+# 1. Cloner le dépôt
 git clone https://github.com/essbony/project_submit.git
 cd project_submit
 
-# Créer et activer l'environnement virtuel
+# 2. Créer et activer l'environnement virtuel
 python3 -m venv .venv
-source .venv/bin/activate ou .env/Scripts/Activate.ps1
 
-# Installer les dépendances pour agent awale
-Installer et utiliser UV 
-uv pip install -r awale_agent/requirements.txt
+# Linux / macOS
+source .venv/bin/activate
+# Windows (PowerShell)
+.venv\Scripts\Activate.ps1
+
+# 3. Installer les dépendances du projet racine
+uv pip install -r requirements.txt
 ```
-[Lien agent-awale](https://awale-agent.streamlit.app/)
-
-
 
 ### Étape B : Configuration des Secrets (`.env`)
-```bash
-Créez un fichier `.env` à la racine contenant vos clés d'API (OpenAI, etc.) :
+
+Créez un fichier `.env` à la racine du projet contenant vos clés d'API :
+
 ```env
 OPENROUTER_API_KEY="....."
-
 LLM_CACHE_PATH=/tmp/llm_cache.sqlite
+```
+
+### Étape C : Lancer l'Agent Awalé (Streamlit)
+
+```bash
+cd awale_agent/
+uv pip install -r requirements.txt
+streamlit run app.py
+```
+🔗 Version déployée : [agent-awale](https://awale-agent.streamlit.app/)
+
+### Étape D : Exécuter le Pipeline dbt
+
+```bash
+cd dbt/
+dbt run && dbt test
+```
+> L'extension DuckDB `spatial` est chargée automatiquement au début de l'exécution (via un hook dbt) pour lire directement les fichiers Excel sources — aucune commande d'installation manuelle n'est nécessaire.
+
+### Étape E : Lancer Superset
+
+```bash
+cd superset_local/
+uv pip install -r requirements-local.txt
+
+# Première utilisation uniquement (build des images + création des conteneurs)
+docker compose up -d --build
+
+# Utilisations suivantes (conteneurs déjà créés)
+docker compose start
+```
+
+---
 
 ## 🧹 4. Étapes de Nettoyage & Data Quality (dbt)
 
 Le pipeline dbt garantit la propreté, l'unicité et la validité des données avant leur exposition dans Superset.
 
 ### Ordre d'exécution obligatoire :
-1. **`spatial et st_read(...) `** : Charge les fichiers EXCEL  statiques de référence et de mapping dans DuckDB.
-2. **`dbt run`** : Exécute les modèles de staging et les marts analytiques (`fct_business_performance`).
-3. **`dbt test`** : Valide l'intégrité des données (tests d'unicité sur les `comment_id`, non-nullité des clés).
+1. **Extension `spatial` (`st_read(...)`)** : chargée en hook au début de `dbt run`, lit directement les fichiers Excel statiques de référence et de mapping dans DuckDB.
+2. **`dbt run`** : exécute les modèles de staging et les marts analytiques (`fct_business_performance`).
+3. **`dbt test`** : valide l'intégrité des données (tests d'unicité sur les `comment_id`, non-nullité des clés).
 
 Commandes d'exécution :
 ```bash
@@ -99,13 +135,13 @@ cd ..
 Superset sert de couche de restitution visuelle pour le pilotage commercial et marketing.
 
 ### Configuration du Tableau de bord (`[ VUE DECISIONNELLE ]`)
-* **Connexion à DuckDB** : Pointage vers la base de données locale/conteneurisée.
-* **Modèle centralisé** : Utilisation de la table `main_marts.fct_business_performance`.
+* **Connexion à DuckDB** : pointage vers la base de données locale/conteneurisée.
+* **Modèle centralisé** : utilisation de la table `main_marts.fct_business_performance`.
 
 ### Résolution d'un contour critique (Visibilité des Canaux Marketing) :
-* **Problème rencontré** : Dans le graphique des dépenses marketing, seuls "Magasin Physique" et "WhatsApp Direct" apparaissaient, tandis que TikTok et Meta semblaient absents ou affichaient 0 en chiffre d'affaires.
-* **Explication** : Les plateformes digitales (TikTok / Meta) concentrent les investissements publicitaires (`marketing_spend_fcfa`) mais génèrent des conversions indirectes ou un suivi de notoriété (Chiffre d'affaires à 0 dans cette table, contrairement aux canaux de vente directe).
-* **Solution dans Superset** : 
+* **Problème rencontré** : dans le graphique des dépenses marketing, seuls "Magasin Physique" et "WhatsApp Direct" apparaissaient, tandis que TikTok et Meta semblaient absents ou affichaient 0 en chiffre d'affaires.
+* **Explication** : les plateformes digitales (TikTok / Meta) concentrent les investissements publicitaires (`marketing_spend_fcfa`) mais génèrent des conversions indirectes ou un suivi de notoriété (chiffre d'affaires à 0 dans cette table, contrairement aux canaux de vente directe).
+* **Solution dans Superset** :
   1. Éditer le graphique de dépenses marketing (`Edit chart`).
   2. S'assurer que le champ **Group by** pointe bien sur `channel_or_platform`.
   3. Vérifier que la métrique sélectionnée est la somme de `marketing_spend_fcfa` pour que les barres de TikTok et Meta s'affichent correctement aux côtés des autres canaux.
@@ -116,7 +152,7 @@ Superset sert de couche de restitution visuelle pour le pilotage commercial et m
 
 Pour rendre l'agent IA accessible en ligne via Streamlit Cloud :
 
-1. **Préparation du dépôt GitHub** : 
+1. **Préparation du dépôt GitHub** :
    * Nettoyer les sous-dossiers `.git` internes pour éviter les liens bloqués sur GitHub.
    * Veiller à ce que `my_db.duckdb` soit ignoré via `.gitignore`.
 2. **Configuration sur Streamlit Cloud** :
@@ -126,8 +162,8 @@ Pour rendre l'agent IA accessible en ligne via Streamlit Cloud :
    * Pour éviter l'erreur `sqlite3.OperationalError: attempt to write a readonly database`, configurer explicitement le chemin du cache LangChain vers `/tmp/llm_cache.sqlite` dans le code de l'agent ou les variables d'environnement de la plateforme.
 
 
-*Généré pour le projet Awalé Boissons — Documentation technique validée.*
+*Généré pour le projet Awalé Boissons — Documentation technique validée.
 
-## Tech Stack
+*Tech Stack
+<img src="describe.svg" alt="Architecture Awalé Boissons" width="100%" />
 
-  <img src="describe.svg" alt="Architecture Awalé Boissons" width="100%" />

@@ -30,3 +30,19 @@ Runtime Error
 [0m18:06:09.398980 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74faac2150f0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74faac219370>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74faac094050>]}
 [0m18:06:09.404674 [debug] [MainThread]: Flushing usage events
 [0m18:06:10.567516 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m23:38:15.259397 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7a512c656270>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7a512b137ed0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7a512b137b10>]}
+
+
+============================== 23:38:15.276717 | 3dbc937b-ed93-4623-b0f2-2a0d0584ee11 ==============================
+[0m23:38:15.276717 [info ] [MainThread]: Running with dbt=1.12.4
+[0m23:38:15.281899 [debug] [MainThread]: running dbt with arguments {'quiet': 'False', 'version_check': 'True', 'warn_error': 'None', 'log_path': 'logs', 'write_json': 'True', 'hints_enabled': 'True', 'indirect_selection': 'eager', 'static_parser': 'True', 'invocation_command': 'dbt run', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'log_cache_events': 'False', 'printer_width': '80', 'no_print': 'None', 'send_anonymous_usage_stats': 'True', 'target_path': 'None', 'maximum_seed_size_mib': '1', 'partial_parse': 'True', 'empty': 'False', 'introspect': 'True', 'use_colors': 'True', 'log_format': 'default', 'debug': 'False', 'profiles_dir': '/home/bony/.dbt', 'use_experimental_parser': 'False', 'cache_selected_only': 'False', 'fail_fast': 'False'}
+[0m23:38:15.283683 [error] [MainThread]: [[31mERROR[0m]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path /home/bony/project_submit/dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m23:38:15.287038 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": false, "command_wall_clock_time": 0.37742746, "process_in_blocks": "80776", "process_kernel_time": 0.449158, "process_mem_max_rss": "108096", "process_out_blocks": "8", "process_user_time": 3.275239}
+[0m23:38:15.291845 [debug] [MainThread]: Command `dbt run` failed at 23:38:15.290723 after 0.38 seconds
+[0m23:38:15.293614 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7a512b185220>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7a512b195370>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7a512b181e10>]}
+[0m23:38:15.296893 [debug] [MainThread]: Flushing usage events
+[0m23:38:16.725574 [debug] [MainThread]: An error was encountered while trying to flush usage events
