@@ -157,6 +157,13 @@ Pour rendre l'agent IA accessible en ligne via Streamlit Cloud :
 3. **Gestion du cache en environnement Read-Only** :
    * Pour éviter l'erreur `sqlite3.OperationalError: attempt to write a readonly database`, configurer explicitement le chemin du cache LangChain vers `/tmp/llm_cache.sqlite` dans le code de l'agent ou les variables d'environnement de la plateforme.
 
+   ## 7-difficultés-rencontrées--solutions
+
+* **Attribution imprécise des canaux digitaux** : TikTok et Meta concentrent les dépenses publicitaires (`marketing_spend_fcfa`) mais génèrent des conversions indirectes — le chiffre d'affaires attribué peut apparaître à 0 dans `fct_business_performance` pour ces canaux, sans que cela signifie une absence d'effet réel.
+* **Formats de téléphone WhatsApp non unifiés à 100 %** : [à compléter selon le taux réel de parsing réussi].
+* **Commentaires sociaux** : ~15 % de spam et mélange français/nouchi/anglais, ce qui limite la précision de toute classification automatique.
+* **Quinzaine manquante** dans les ventes en point de vente : toute analyse de tendance sur cette période reste incomplète...
+
 ## Schéma des modèles & dictionnaire de données
 
 ### Représentation visuelle (graphe de lignage dbt)
@@ -199,7 +206,7 @@ Mart final consolidant les revenus nets et les dépenses marketing par mois et p
 
 > **Limite connue** : les colonnes `négatif_comments` et `neutre_commentaires` rompent la convention de nommage anglaise du reste du mart (`positive_comments`, `spam_comments`) — nommage à harmoniser en `negative_comments` / `neutral_comments` dans une prochaine itération.
 
-# Usage de l'IA
+## Usage de l'IA
 
 * **Composant IA implémenté** : [agent Text-to-SQL (LangChain `SQLDatabase` + openai/gpt-4o via OpenRouter, interface Streamlit) interrogeant `fct_business_performance` en langage naturel].
 
