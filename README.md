@@ -219,9 +219,6 @@ Mart final consolidant les revenus nets et les dépenses marketing par mois et p
 ---
 
 
-
----
-
 ## 📊 Vue Décisionnelle
 
 ![Vue Décisionnelle du Projet](images/vue-decisionnelle.jpg)
