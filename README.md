@@ -74,10 +74,6 @@ uv pip install -r requirements.txt
 
 Créez un fichier `.env` à la racine du projet contenant vos clés d'API :
 
-```env
-OPENROUTER_API_KEY="....."
-LLM_CACHE_PATH=/tmp/llm_cache.sqlite
-```
 
 ### Étape C : Lancer l'Agent Awalé (Streamlit)
 
